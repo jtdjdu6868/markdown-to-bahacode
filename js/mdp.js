@@ -229,7 +229,7 @@ let makeMDP = function (argConfig) {
 		cAr.push ({	// Strike
 			tag: "SI",	// Just for use array management.
 			priority: 20,
-			provisionalText: '[s]]$1[/s]',
+			provisionalText: '[s]$1[/s]',
 			matchRegex: new RegExp("~~(.+?)~~", 'g'),
 			converter: function ( argBlock ) {return null;},
 			matchedString: new Array()
