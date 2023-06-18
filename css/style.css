@@ -3,3 +3,11 @@ textarea
     height: 500px;
     width: 400px;
 }
+#body
+{
+    display: flex;
+}
+#body button
+{
+    margin: auto 10px;
+}
