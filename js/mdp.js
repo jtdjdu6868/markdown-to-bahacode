@@ -8,7 +8,7 @@
 // Usage
 // 
 // var mdp = makeMDP();
-// var html_text = mdp.render( markdown_test );
+// var html_text = mdp.convert( markdown_test );
 // 
 // ============
 // TO CHANGE SYNTAX
@@ -452,8 +452,7 @@ let makeMDP = function (argConfig) {
 			return retText.replace(/\[li\]\n*\[\/li]/g, "");
 		},
 		mdBlockquoteParser: function ( argText ) {
-			// let retText = '<blockquote>\n';
-            let retText = "";
+			let retText = '[div]\n';
 			argText = argText.replace( /\n\s*(?=[^>])/g, " ");
 			argText = argText.replace( /^\s*>\s*/, "").replace( /\n\s*>\s*/g, "\n");
 			let lineText = argText.split(/\n/);
@@ -471,7 +470,7 @@ let makeMDP = function (argConfig) {
 			}
 			if (tempText != "")
 				retText += this.mdBlockquoteParser(tempText);
-			return retText;
+			return retText + '\n[/div]';
 		},
 
 		analyzeStructure: function( argText ) {
@@ -493,7 +492,7 @@ let makeMDP = function (argConfig) {
 			// console.log(argText);	// to see structure
 			return argText;
 		},
-		render: function( argText ) {
+		convert: function( argText ) {
 			const cAr = this.blockSyntax;
 			const delimiter = this.config.delimiter;
 
