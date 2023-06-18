@@ -67,12 +67,12 @@ let makeMDP = function (argConfig) {
 				if (/^`{3}.+$/m.test(argBlock))
 					return temp.replace(	
 						new RegExp("^`{3}(.+?)\\n([\\s\\S]*)\\n`{3}$"),
-						'<pre><code class="'+codeLangPrefix+'$1">$2</code></pre>'
+                        "[table border=1][tr][td][font=Courier New]$2[/font][/td][/tr][/table]"
 					);
 				else
 					return temp.replace(
 						new RegExp("^`{3}\\n([\\s\\S]*)\\n`{3}$"),
-						"<pre><code>$1</code></pre>"
+                        "[table border=1][tr][td][font=Courier New]$1[/font][/td][/tr][/table]"
 					);
 			},
 			matchedString: new Array()
@@ -108,19 +108,19 @@ let makeMDP = function (argConfig) {
 			priority: 70,
 			matchRegex: new RegExp("^<!--[\\s\\S]*?-->$", 'gm'),
 			converter: function ( argBlock ) {
-				return argBlock.replace( new RegExp("^(<!--[\\s\\S]*?-->)$"), "$1" );
+				return argBlock.replace( new RegExp("^(<!--[\\s\\S]*?-->)$"), "" );
 			},
 			matchedString: new Array()
 		});
-		cAr.push ( {
+		cAr.push ( {    // headings
 			tag: "HD",
 			priority: 60,
 			provisionalText: "\n"+delimiter+"HD"+delimiter+"\n",	// to divide list, \n is added.
 			matchRegex: new RegExp("^#{1,} +.+$", 'gm'),
 			converter: function ( argBlock ) {
-				var num = argBlock.match(/^#{1,}(?= )/)[0].length;
+				var num = argBlock.match(/^#{1,}(?= )/)[0].length + 1;
 				var temp = argBlock.replace(/"/g, '')
-					.replace( new RegExp('^\\n*#{1,} +(.+?)[\\s#]*$'), '<h'+num+' id="$1">$1</h'+num+'>' );
+					.replace( new RegExp('^\\n*#{1,} +(.+?)[\\s#]*$'), '[h'+num+']$1[/h'+num+']' );
 				return Obj.mdInlineParser(temp, null);
 			},
 			matchedString: new Array()
@@ -131,7 +131,7 @@ let makeMDP = function (argConfig) {
 			provisionalText: "\n"+delimiter+"HR"+delimiter+"\n",	// to divide list, \n is added.
 			matchRegex: new RegExp("^ *[-+*=] *[-+*=] *[-+*=][-+*= ]*$", 'gm'),
 			converter: function ( argBlock ) {
-				return "<hr>";
+				return "[hr]";
 			},
 			matchedString: new Array()
 		});
@@ -175,7 +175,7 @@ let makeMDP = function (argConfig) {
 			priority: 0,
 			matchRegex: new RegExp('^.(?!'+delimiter[0]+'.{2}'+delimiter+')[\\s\\S]*?\\n$', 'gm'),
 			converter: function ( argBlock ) {
-				var temp = '<p>'+argBlock.replace( /^\n*|\n*$/g, "" )+'</p>';
+				var temp = '[div]'+argBlock.replace( /^\n*|\n*$/g, "" )+'[/div]';
 				return Obj.mdInlineParser(temp, null);
 			},
 			matchedString: new Array()
@@ -190,45 +190,30 @@ let makeMDP = function (argConfig) {
 			priority: 100,
 			matchRegex: new RegExp("`.+?`", 'g'),
 			converter: function ( argBlock ) {
-				return "<code>"+ argBlock.replace(/`(.+?)`/g,"$1").replace(/</g,'&lt;').replace(/>/g,'&gt;') +"</code>";
+				return "[font=Courier New][bgcolor=#EEEEEE]"+ argBlock.replace(/`(.+?)`/g,"$1").replace(/</g,'&lt;').replace(/>/g,'&gt;') +"[/bgcolor][/font]";
 			},
-			matchedString: new Array()
-		});
-		cAr.push ({	// inline math
-			tag: "IM",
-			priority: 90,
-			matchRegex: new RegExp(subsDollar+".+?"+subsDollar, 'g'),
-			converter: function ( argBlock ) { return '<span class="mdpmath">'+argBlock+'</span>'; },
-			matchedString: new Array()
-		});
-		cAr.push ({	// math reference
-			tag: "RF",
-			priority: 70,
-			provisionalText: '<span class="mdpmath">\\$1ref{$2}</span>',
-			matchRegex: new RegExp('\\\\(eq)?ref{(.*)}', 'g'),
-			converter: function ( argBlock ) {return null;},
 			matchedString: new Array()
 		});
 		cAr.push ({	// img
 			tag: "IG",
 			priority: 60,
-			provisionalText: '<img src="$2" alt="$1">',
+			provisionalText: '[img=$2]',
 			matchRegex: new RegExp("!\\[(.*?)\\]\\((.+?)\\)", 'g'),
 			converter: function ( argBlock ) {return null;},
 			matchedString: new Array()
 		});
 		cAr.push ({	// Anchor Link
 			tag: "AC",	// Just for use array management.
-			priority: 50,
-			provisionalText: '<a href="$2">$1</a>',					// the string is used for replace.
-			matchRegex: new RegExp("\\[(.+?)\\]\\((.+?)\\)", 'g'),	// the RexExp is used for replace.
+			priority: 100,
+			provisionalText: '[url=$2]$1[/url]',					// the string is used for replace.
+			matchRegex: new RegExp("\\[([^\\]]+?)\\]\\((.+?)\\)", 'g'),	// the RexExp is used for replace.
 			converter: function ( argBlock ) {return null;},
 			matchedString: new Array()
 		});
 		cAr.push ({		// Strong
 			tag: "SO",	// Just for use array management.
 			priority: 40,
-			provisionalText: '<strong>$1</strong>',
+			provisionalText: '[b]$1[/b]',
 			matchRegex: new RegExp("\\*\\*(.+?)\\*\\*", 'g'),
 			converter: function ( argBlock ) {return null;},
 			matchedString: new Array()
@@ -236,7 +221,7 @@ let makeMDP = function (argConfig) {
 		cAr.push ({	// Emphasize
 			tag: "EM",	// Just for use array management.
 			priority: 30,
-			provisionalText: '<em>$1</em>',
+			provisionalText: '[i]$1[/i]',
 			matchRegex: new RegExp("\\*(.+?)\\*", 'g'),
 			converter: function ( argBlock ) {return null;},
 			matchedString: new Array()
@@ -244,7 +229,7 @@ let makeMDP = function (argConfig) {
 		cAr.push ({	// Strike
 			tag: "SI",	// Just for use array management.
 			priority: 20,
-			provisionalText: '<strike>$1</strike>',
+			provisionalText: '[s]]$1[/s]',
 			matchRegex: new RegExp("~~(.+?)~~", 'g'),
 			converter: function ( argBlock ) {return null;},
 			matchedString: new Array()
@@ -360,40 +345,40 @@ let makeMDP = function (argConfig) {
 			let alignText = new Array();
 			for (let jj = 0; jj < items.length; jj++)
 				if ( /^:[\s-]+:$/.test(items[jj]) )
-					alignText.push(" style='text-align:center'");	// center align
+					alignText.push(" align=center");	// center align
 				else if( /^:[\s-]+$/.test(items[jj]) )
-					alignText.push(" style='text-align:left'");		// left align
+					alignText.push("");		// left align
 				else if( /^[\s-]+:$/.test(items[jj]) )
-					alignText.push(" style='text-align:right'");	// right align
+					alignText.push(" align=right");	// right align
 				else
 					alignText.push("");
 			// For 1st line
-			retText = "<table>\n";
-			retText +=  "<thead><tr>\n";
+			retText = "[table]\n";
+			retText +=  "[tr]\n";
 			items = lineText[0].replace(/^\|\s*/, "").replace(/\s*\|$/, "").split(/\s*\|\s*/g);
 			for (let jj = 0; jj < alignText.length; jj++)
-				retText +=  "<th"+alignText[jj]+">" + items[jj] + "</th>\n";
+				retText +=  "[td"+alignText[jj]+"]" + items[jj] + "[/td]\n";
 			// For 3rd and more
-			retText +=  "</tr></thead>\n";
-			retText +=  "<tbody>\n";
+			retText +=  "[/tr]\n";
+			// retText +=  "<tbody>\n";
 			for (let kk = 2; kk < lineText.length; kk++) {
 				lineText[kk] = lineText[kk].replace(/^\|\s*/, "");
 				items = lineText[kk].split(/\s*\|+\s*/g);
 				let colDivText = lineText[kk].replace(/\s/g, "").match(/\|+/g);
-				retText +=  "<tr>\n";
+				retText +=  "[tr]\n";
 				let num = 0;
 				for (let jj = 0; jj < (colDivText||[]).length; jj++) {
 					if (colDivText[jj] == "|") {
-						retText +=  "<td"+alignText[num]+">" + items[jj] + "</td>\n";
+						retText +=  "[td"+alignText[num]+"]" + items[jj] + "[/td]\n";
 						num += 1;
 					} else {
-						retText +=  "<td"+alignText[num]+" colspan='"+colDivText[jj].length+"'>" + items[jj] + "</td>\n";
+						retText +=  "[td"+alignText[num]+"]" + items[jj] + "[/td]\n";
 						num += colDivText[jj].length;
 					}
 				}
-				retText +=  "</tr>\n";
+				retText +=  "[/tr]\n";
 			}
-			retText +=  "</tbody></table>";
+			retText +=  "[/table]";
 			return retText;
 		},
 		mdListParser: function ( argText, spacesForNest ) {
@@ -435,7 +420,7 @@ let makeMDP = function (argConfig) {
 				listRegex = new RegExp("^\\s*?\\d+\\.\\s+(.*?)$");
 			else
 				listRegex = new RegExp("^\\s*?[-+*]\\s+(.*?)$");
-			retText += "<"+listType.toLowerCase()+"><li>";
+			retText += "["+listType.toLowerCase()+"][li]";
 			let lineDepth, lineType;
 			let tempText = "";
 			for (let jj = 0; jj < (lines||[]).length; jj++) {
@@ -446,15 +431,15 @@ let makeMDP = function (argConfig) {
 						retText += this.mdListParser( tempText.replace(/\n*$/, ""), spacesForNest ).replace(/\n*$/, "");
 						tempText = "";
 					}
-					if (loose) retText += "</li>\n<li><p>"+lines[jj].replace(listRegex, "$1") + "</p>\n";
-					else retText += "</li>\n<li>"+lines[jj].replace(listRegex, "$1") + "\n";
+					if (loose) retText += "[/li]\n[li][div]"+lines[jj].replace(listRegex, "$1") + "[/div]\n";
+					else retText += "[/li]\n[li]"+lines[jj].replace(listRegex, "$1") + "\n";
 				} else if ( lineDepth >= depth+this.config.spacesForNest) {	// create nested list
 					tempText += lines[jj]+"\n";
 				} else {	// simple paragraph
 					if (tempText != "") {
 						tempText += lines[jj]+"\n";
 					} else {
-						if (loose) retText += '<p>'+lines[jj]+'</p>\n';
+						if (loose) retText += '[div]'+lines[jj]+'[/div]\n';
 						else retText += lines[jj]+"\n";
 					}
 				}
@@ -463,11 +448,12 @@ let makeMDP = function (argConfig) {
 				retText += this.mdListParser( tempText.replace(/\n*$/, ""), spacesForNest ).replace(/\n*$/, "");
 			}
 	
-			retText += "</li></"+listType.toLowerCase()+">";
-			return retText.replace(/<li>\n*<\/li>/g, "");
+			retText += "[/li][/"+listType.toLowerCase()+"]";
+			return retText.replace(/\[li\]\n*\[\/li]/g, "");
 		},
 		mdBlockquoteParser: function ( argText ) {
-			let retText = '<blockquote>\n';
+			// let retText = '<blockquote>\n';
+            let retText = "";
 			argText = argText.replace( /\n\s*(?=[^>])/g, " ");
 			argText = argText.replace( /^\s*>\s*/, "").replace( /\n\s*>\s*/g, "\n");
 			let lineText = argText.split(/\n/);
@@ -485,7 +471,7 @@ let makeMDP = function (argConfig) {
 			}
 			if (tempText != "")
 				retText += this.mdBlockquoteParser(tempText);
-			return retText + '\n</blockquote>';
+			return retText;
 		},
 
 		analyzeStructure: function( argText ) {
