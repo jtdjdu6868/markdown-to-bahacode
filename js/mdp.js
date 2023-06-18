@@ -246,7 +246,8 @@ let makeMDP = function (argConfig) {
 			latexEnv: new Array('equation', 'eqnarray', 'align', 'align\\*'),
 			spacesForNest: 2,			// number of spaces for nested lists.
 			tabTo: "  ",			// \t -> two spaces
-			codeLangPrefix: "language-"		// ```clang ... ``` -> <pre><code class="language-clang"> ... </code></pre>
+			codeLangPrefix: "language-",		// ```clang ... ``` -> <pre><code class="language-clang"> ... </code></pre>
+            newlineBefore: new Array(["HD"])
 		},
 		blockSyntax: new Array(),
 		inlineSyntax: new Array(),
@@ -488,8 +489,10 @@ let makeMDP = function (argConfig) {
 					cAr[ii].provisionalText = this.config.delimiter+cAr[ii].tag+this.config.delimiter;
 				argText = argText.replace( cAr[ii].matchRegex, cAr[ii].provisionalText );
 			}
-			argText = argText.replace(/\n{2,}/g, "\n");
-			// console.log(argText);	// to see structure
+            // TODO remove new line not in the tag whitelist
+			argText = argText.replace(/\n/g, "");
+            argText = argText.replace(new RegExp("(?=" + this.config.newlineBefore.map((e) => this.config.delimiter+e+this.config.delimiter).join('|') + ")", 'g'), "\n");
+			console.log(argText);	// to see structure
 			return argText;
 		},
 		convert: function( argText ) {
