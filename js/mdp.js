@@ -492,7 +492,7 @@ let makeMDP = function (argConfig) {
             // TODO remove new line not in the tag whitelist
 			argText = argText.replace(/\n/g, "");
             argText = argText.replace(new RegExp("(?=" + this.config.newlineBefore.map((e) => this.config.delimiter+e+this.config.delimiter).join('|') + ")", 'g'), "\n");
-			console.log(argText);	// to see structure
+			// console.log(argText);	// to see structure
 			return argText;
 		},
 		convert: function( argText ) {
