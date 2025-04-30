@@ -67,7 +67,7 @@ let makeMDP = function (argConfig) {
 				if (/^`{3}.+$/m.test(argBlock))
 					return temp.replace(	
 						new RegExp("^`{3}(.+?)\\n([\\s\\S]*)\\n`{3}$"),
-                        "[table width=99% border=1][tr][td][font=Courier New]$2[/font][/td][/tr][/table]"
+                        "[table width=99% border=1][tr][td]$1[/td][/tr][tr][td][font=Courier New]$2[/font][/td][/tr][/table]"
 					);
 				else
 					return temp.replace(
