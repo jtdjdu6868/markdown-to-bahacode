@@ -453,7 +453,7 @@ let makeMDP = function (argConfig) {
 			return retText.replace(/\[li\]\n*\[\/li]/g, "");
 		},
 		mdBlockquoteParser: function ( argText ) {
-			let retText = '[div]\n';
+			let retText = '[quote]';
 			argText = argText.replace( /\n\s*(?=[^>])/g, " ");
 			argText = argText.replace( /^\s*>\s*/, "").replace( /\n\s*>\s*/g, "\n");
 			let lineText = argText.split(/\n/);
@@ -471,7 +471,7 @@ let makeMDP = function (argConfig) {
 			}
 			if (tempText != "")
 				retText += this.mdBlockquoteParser(tempText);
-			return retText + '\n[/div]';
+			return retText + '[/quote]';
 		},
 
 		analyzeStructure: function( argText ) {
